@@ -1,5 +1,7 @@
 # Credit-Card-Churn-Analysis
-Analysing  bank credit card data and predict which group of customers are more likely to get churned so that we can target them to provide better services and turn customers' decisions in the opposite direction using MySQL
+Analysing  bank credit card data and predict which group of customers are more likely to get churned so that we can target them to provide better services and turn customers' decisions in the opposite direction using MySQL and Tableau
+
+Credit cards play an essential role in the banking world. As customers, we might scratch credit cards with the best offers and financial security. 
 
 ## Data Description
 The table consists of 18 columns and 10127 rows 
@@ -23,6 +25,12 @@ The table consists of 18 columns and 10127 rows
 + Total_Ct_Chng_Q4_Q1 Num Change in Transaction Count (Q4 over Q1)
 + Avg_Utilization_Ratio - Average Card Utilization Ratio
 
+## Objectives
+1). Analysis based on Demographic Variables
+
+2). Analysis based on Product Variables 
+
+3). Recommedations
 
 ``` sql
 SELECT *
@@ -31,6 +39,15 @@ DESCRIBE churncostomerseda.bankchurners;
 ```
 
 ![image](https://user-images.githubusercontent.com/92436079/228345475-f991c52f-955f-4d10-a586-7eb60ecba272.png)
+
+```sql
+SELECT 
+round(COUNT(CASE WHEN Attrition_Flag = '1' THEN Clientnum END) / COUNT(Clientnum),2) * 100 AS churn_rate,
+round(COUNT(CASE WHEN Attrition_Flag = '0' THEN Clientnum END) / COUNT(Clientnum),2) * 100 AS retention_rate
+FROM churncostomerseda.bankchurners;
+``` 
+
+![image](https://user-images.githubusercontent.com/92436079/228434546-3cfbfa39-6621-49ff-8a79-273d28517c71.png)
 
 ## Data Cleaning
 **Checking for misssing values**
@@ -50,7 +67,9 @@ FROM churncostomerseda.bankchurners;
 ```
 + There's a total of  unique 10127 customers
 
-## Column Manipulation
+## Demographic Variables
+
+### Column Manipulation
 **Transforming the Attrition flag column into 1 and 0 using  CASE statement**
 
 ```sql
@@ -170,7 +189,8 @@ ORDER BY Dependent_count ASC;
 + Therefore, the number of dependents does not significantly impact the customer churn rate in this dataset.
 
 **Education Level**
-Customers with Doctorate level of education have the highest churn rate of 21.06% followed by those with postgraduate at 17.83%
+
+```sql
 SELECT 
 Education_Level,
 SUM(CASE WHEN Attrition_Flag = '1' THEN 1 ELSE 0 END) AS churned_customer_count,
@@ -179,9 +199,16 @@ CONCAT(ROUND((SUM(CASE WHEN Attrition_Flag = '1' THEN 1 ELSE 0 END) / (SUM(CASE 
 FROM churncostomerseda.bankchurners
 GROUP BY Education_Level
 ORDER BY Education_Level ASC;
+```
 
-/* Marital Status
-the marital status ranges from 15-18% with those of unknown marital status having the highest churn rate */
+![image](https://user-images.githubusercontent.com/92436079/228409575-dc211745-d8cf-41d3-8559-2f2f935b27ca.png)
+
+
++ Customers with Doctorate level of education have the highest churn rate of 21.06% followed by those with postgraduate at 17.83%
+
+**Marital Status**
+
+```sql
 SELECT 
 Marital_Status,
 SUM(CASE WHEN Attrition_Flag = '1' THEN 1 ELSE 0 END) AS churned_customer_count,
@@ -190,11 +217,12 @@ CONCAT(ROUND((SUM(CASE WHEN Attrition_Flag = '1' THEN 1 ELSE 0 END) / (SUM(CASE 
 FROM churncostomerseda.bankchurners
 GROUP BY Marital_Status
 ORDER BY Marital_Status ASC;
+```
 
-/* Income Category
-Customers earning $120K+ had the highest churn rate of 17.33% but then the difference between extsting customers and attrited customers is low for that income bracket but then again
-Other factors such as customer satisfaction, pricing,customer service,product and service quality and competition should also be taken into account to better understand why customers are leaving and how to improve retention.
-followed by customers earning less than $40K have the highest churn rate of 17.19% with 2337 customer difference */
+![image](https://user-images.githubusercontent.com/92436079/228410962-8457cb7c-cedb-494a-be66-9cf8e1d6d0e5.png)
+
+**Income Category**
+```sql
 SELECT 
 Income_Category,
 SUM(CASE WHEN Attrition_Flag = '1' THEN 1 ELSE 0 END) AS churned_customer_count,
@@ -204,9 +232,17 @@ CONCAT(ROUND((SUM(CASE WHEN Attrition_Flag = '1' THEN 1 ELSE 0 END) / (SUM(CASE 
 FROM churncostomerseda.bankchurners
 GROUP BY Income_Category
 ORDER BY Income_Category ASC;
-/* Card category
-The Platinum card has the highest churn rate of 25.00%, followed by the Gold card at 18.10%, the Blue card at 16.10%, and the Silver card at 14.77%.
-a smaller difference can lead to a higher churn rate. for instance the Gold card has a relatively small difference of 74, but it has a high churn rate of 18.10%. This could be due to a variety of factors, such as dissatisfaction with the service or better offers from competitors.*/
+```
+
+![image](https://user-images.githubusercontent.com/92436079/228415019-bac583db-f956-42e3-948e-9fe145b7d5e1.png)
+
++ Customers earning $120K+ had the highest churn rate of 17.33%,Followed by customers earning less than $40K have the highest churn rate of 17.19%.
++ The difference between existing and attrited customers is low for that income bracket, but then again.
++ Other factors such as customer satisfaction, pricing, customer service, product, service quality, and competition should also be considered to understand better why customers are leaving and how to improve retention.
+
+**Card category**
+
+```sql
 SELECT 
 Card_Category,
 SUM(CASE WHEN Attrition_Flag = '1' THEN 1 ELSE 0 END) AS churned_customer_count,
@@ -216,15 +252,17 @@ CONCAT(ROUND((SUM(CASE WHEN Attrition_Flag = '1' THEN 1 ELSE 0 END) / (SUM(CASE 
 FROM churncostomerseda.bankchurners
 GROUP BY Card_Category
 ORDER BY Card_Category ASC;
+```
 
-/* Product Category
- months_on_book 
-the number of months a customer has been on the book increases, the retention rate also increases.
-for customers who have been on the book for 13 months, the retention rate is 90% and the churn rate is 10%. However, for customers who have been on the book for 56 months, 
-the retention rate is 83.5% and the churn rate is 16.5%.
-fluctuations in the churn and retention rates for different values of "Months_on_book". For example, for customers who have been on the book for 15 months, the churn rate is relatively high at 26.47%, while the retention rate is 73.53%. Similarly, for customers who have been on the book for 37 months,
-the churn rate is relatively high at 17.32%, while the retention rate is 82.68%.
-there may be some specific time periods (such as 15 months and 37 months) where the churn rate is relatively high and the company may need to focus on improving customer retention during those periods.*/
+
++ The Platinum card has the highest churn rate of 25.00%, followed by the Gold card at 18.10%, the Blue card at 16.10%, and the Silver card at 14.77%.
++ A difference between existing and churned customers can lead to a higher churn rate. For instance, the Gold card has a relatively small difference of 74, but it has a high churn rate of 18.10%, maybe due to various factors, such as dissatisfaction with the service or better offers from competitors.
+
+## Product Variables
+
+**Months_on_book** 
+
+```sql
 SELECT 
 Months_on_book,
 SUM(CASE WHEN Attrition_Flag = '1' THEN 1 ELSE 0 END) AS churned_customer_count,
@@ -235,11 +273,21 @@ CONCAT(ROUND((SUM(CASE WHEN Attrition_Flag = '0' THEN 1 ELSE 0 END) / (SUM(CASE 
 FROM churncostomerseda.bankchurners
 GROUP BY Months_on_book
 ORDER BY Months_on_book ASC;
-/* total relationship count
-  the total relationship count increases, the churn rate decreases and the retention rate increases. Customers with a total relationship count of 6 have the highest retention rate at 89.50%,
-  while customers with a total relationship count of 2 have the highest churn rate at 27.84%.
-  that customers who have multiple products or services with a company are more likely to stay, while customers with only one product or service are more likely to leave. 
-  It may be worthwhile for the company to encourage customers to sign up for additional products or services to improve retention rates*/
+```
+
+![image](https://user-images.githubusercontent.com/92436079/228416475-b86f8930-169e-4d46-958b-b2e07d29fa1d.png).
+
+![Months](https://user-images.githubusercontent.com/92436079/228417862-b2aa9f9b-13c0-4058-992e-64e918568107.png)
+
+
++ The number of months a customer has been on the book increases, and the retention rate also increases.
++ For customers who have been on the book for 13 months, the retention rate is 90%, and the churn rate is 10%. However, for customers who have been on the book for 56 months, the retention rate is 83.5%, and the churn rate is 16.5%.
++ Fluctuations in the churn and retention rates for different values, for customers who have been on the book for 15 months, the churn rate is relatively high at 26.47%, while the retention rate is 73.53%. Similarly, for customers who have been on the book for 37 months,the churn rate is relatively high at 17.32%, while the retention rate is 82.68%.
++ There may be some specific periods (such as 15 months and 37 months) where the churn rate is relatively high, and the company may need to focus on improving customer retention during those periods.
+
+**Total Relationship Count**
+ 
+```sql
 SELECT 
 Total_Relationship_Count,
 SUM(CASE WHEN Attrition_Flag = '1' THEN 1 ELSE 0 END) AS churned_customer_count,
@@ -250,13 +298,20 @@ CONCAT(ROUND((SUM(CASE WHEN Attrition_Flag = '0' THEN 1 ELSE 0 END) / (SUM(CASE 
 FROM churncostomerseda.bankchurners
 GROUP BY Total_Relationship_Count
 ORDER BY Total_Relationship_Count ASC;
+```
 
-/* month inactive 12 months
-The first row, with 0 months of inactivity, shows that 51.72% of the customers who were inactive for 0 months churned, while the remaining 48.28% were retained.
+![image](https://user-images.githubusercontent.com/92436079/228431533-9c7fec9a-d18a-4324-bf5e-66e2e7521e1d.png)
 
-As the number of months of inactivity increased, the churn rate increased and the retention rate decreased. For example, when customers were inactive for 1 month, only 4.48% of them churned, while 95.52% were retained. However, when customers were inactive for 4 months, the churn rate was 29.89%, indicating that nearly one-third of the customers who were inactive for 4 months churned.
++ As the total relationship count increases, the churn rate decreases, and the retention rate increases. Customers with a total relationship count of 6 have the
+highest retention rate at 89.50%, while customers with a total relationship count of 2 have the highest churn rate at 27.84%.
++ Customers with multiple products or services with a company are likelier to stay, while customers with only one product or service are likelier to leave. 
++ It may be worthwhile for the company to encourage customers to sign up for additional products or services to improve retention rates.
 
-This trend suggests that customer engagement is an essential factor in retaining customers. As customers become less engaged and less active, they are more likely to churn. Therefore, it is crucial for companies to continuously engage and communicate with their customers to keep them satisfied and retain their business.*/
+
+
+**Month Inactive 12 Months Frame**
+
+```sql
 SELECT 
 Months_Inactive_12_mon,
 SUM(CASE WHEN Attrition_Flag = '1' THEN 1 ELSE 0 END) AS churned_customer_count,
@@ -266,13 +321,20 @@ CONCAT(ROUND((SUM(CASE WHEN Attrition_Flag = '0' THEN 1 ELSE 0 END) / (SUM(CASE 
 FROM churncostomerseda.bankchurners
 GROUP BY Months_Inactive_12_mon
 ORDER BY Months_Inactive_12_mon ASC;
+```
 
-/*Customer count within 12 months
-As the number of times the bank contacted the customer increases, the churn rate tends to increase as well. For example, customers who were contacted 5 times had a churn rate of 33.52%, which is higher than the churn rate of customers who were contacted only once (7.20%). This suggests that excessive contact with customers may lead to dissatisfaction and ultimately churn.
+![image](https://user-images.githubusercontent.com/92436079/228430756-5a59347a-0444-4f36-8c54-15a5221781c8.png)
 
-It is also interesting to note that customers who were contacted 6 times had a 100% churn rate, meaning that all of these customers left the bank. This could indicate that the bank may have over-contacted these customers or that there were underlying issues with the bank's products or services that led to such high churn rates.
+![Months (1)](https://user-images.githubusercontent.com/92436079/228431184-5750a718-2e3c-4dcd-be26-387aabe9f5ca.png)
 
-Overall, these results highlight the importance of finding the right balance in customer outreach and engagement to maintain customer satisfaction and prevent churn.*/
+
++ The first row, with 0 months of inactivity, shows that 51.72% of the customers who were inactive for 0 months churned, while the remaining 48.28% were retained.
++ As the number of months of inactivity increased, the churn rate and retention rate decreased. For example, when customers were inactive for 1 month, only 4.48% of them churned, while 95.52% were retained. However, when customers were inactive for 4 months, the churn rate was 29.89%, indicating that nearly one-third of the customers who were inactive for 4 months churned.
++ This trend suggests that customer engagement is an essential factor in retaining customers. Customers are more likely to churn as they become less engaged and less active. Therefore, it is crucial for companies to continuously engage and communicate with their customers to keep them satisfied and retain their business
+
+**Customer count within 12 months**
+
+```sql
 SELECT 
 Contacts_Count_12_mon,
 SUM(CASE WHEN Attrition_Flag = '1' THEN 1 ELSE 0 END) AS churned_customer_count,
@@ -281,10 +343,19 @@ CONCAT(ROUND((SUM(CASE WHEN Attrition_Flag = '1' THEN 1 ELSE 0 END) / (SUM(CASE 
 FROM churncostomerseda.bankchurners
 GROUP BY Contacts_Count_12_mon
 ORDER BY Contacts_Count_12_mon ASC;
+```
 
+![image](https://user-images.githubusercontent.com/92436079/228420963-1c890b91-98da-41d3-8c67-aa2c91ce30ea.png)
 
-/* transaction amount  
-existing customers transact more the the attrited customers*/
+![Sheet 9](https://user-images.githubusercontent.com/92436079/228429899-e4b8cc9a-554a-4610-aad4-616873b1f179.png)
+
++ As the number of times the bank contacts the customer increases, the churn rate also tends to increase. For example, customers contacted 5 times had a churn rate of 33.52%, higher than those contacted only once (7.20%). Suggesting excessive contact with customers may lead to dissatisfaction and, ultimately, churn.
++ It is also interesting to note that customers who were contacted 6 times had a 100% churn rate, meaning that all of these customers left the bank—indicating that the bank may have over-contacted these customers or that there were underlying issues with the bank's products or services that led to such high churn rates.
++ These results highlight the importance of balancing customer outreach and engagement to maintain customer satisfaction and prevent churn.
+
+**Transaction Amount**
+
+```sql
 SELECT 
 Attrition_Flag,
 SUM(Total_Trans_Amt) AS total_transaction_amount,
@@ -293,14 +364,24 @@ SUM(CASE WHEN Attrition_Flag = '0' THEN 1 ELSE 0 END) AS existing_customer_count
 FROM churncostomerseda.bankchurners
 GROUP BY Attrition_Flag
 ORDER BY SUM(Total_Trans_Amt) DESC;
-/*average utilization ratio
- The lesser the utilization of the card the higher the chances of attrition*/
+```
+![image](https://user-images.githubusercontent.com/92436079/228430150-4972523c-5835-4d11-984e-933c7f2ef42d.png)
+
++ Existing customers transact more the the attrited customers
+
+**Average Utilization Ratio**
+
+```sql
 SELECT 
 CONCAT(ROUND(SUM(CASE WHEN Attrition_Flag = '1' THEN 1 ELSE 0 END) / COUNT(*) * 100, 2), '%') AS churned_customer_percentage,
 CONCAT(ROUND(SUM(CASE WHEN Attrition_Flag = '0' THEN 1 ELSE 0 END) / COUNT(*) * 100, 2), '%') AS existing_customer_percentage
 FROM churncostomerseda.bankchurners;
+```
+
+![image](https://user-images.githubusercontent.com/92436079/228430990-e9eedda0-77df-416e-9b13-c249fb03bd4a.png)
+
++ The lesser the utilization of the card the higher the chances of attrition
+
+## Recommmedations
 
 
-
-*age**
-#26-40
