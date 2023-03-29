@@ -1,7 +1,12 @@
 # Credit-Card-Churn-Analysis
+
+![image](https://user-images.githubusercontent.com/92436079/228472373-b3d63413-fdd6-400b-a264-97177c8f7e46.png)
+
 Analysing  bank credit card data and predict which group of customers are more likely to get churned so that we can target them to provide better services and turn customers' decisions in the opposite direction using MySQL and Tableau
 
 Credit cards play an essential role in the banking world. As customers, we might scratch credit cards with the best offers and financial security. 
+
+[Data Source](https://www.kaggle.com/datasets/sakshigoyal7/credit-card-customers)
 
 ## Data Description
 The table consists of 18 columns and 10127 rows 
@@ -30,8 +35,6 @@ The table consists of 18 columns and 10127 rows
 
 2). Analysis based on Product Variables 
 
-3). Recommedations
-
 ``` sql
 SELECT *
 FROM churncostomerseda.bankchurners;
@@ -40,14 +43,14 @@ DESCRIBE churncostomerseda.bankchurners;
 
 ![image](https://user-images.githubusercontent.com/92436079/228345475-f991c52f-955f-4d10-a586-7eb60ecba272.png)
 
+**General Overview**
 ```sql
 SELECT 
 round(COUNT(CASE WHEN Attrition_Flag = '1' THEN Clientnum END) / COUNT(Clientnum),2) * 100 AS churn_rate,
 round(COUNT(CASE WHEN Attrition_Flag = '0' THEN Clientnum END) / COUNT(Clientnum),2) * 100 AS retention_rate
 FROM churncostomerseda.bankchurners;
 ``` 
-
-![image](https://user-images.githubusercontent.com/92436079/228434546-3cfbfa39-6621-49ff-8a79-273d28517c71.png)
+![image](https://user-images.githubusercontent.com/92436079/228463715-3361e27d-c506-4bfd-a998-c4c29c184e29.png)
 
 ## Data Cleaning
 **Checking for misssing values**
@@ -221,6 +224,9 @@ ORDER BY Marital_Status ASC;
 
 ![image](https://user-images.githubusercontent.com/92436079/228410962-8457cb7c-cedb-494a-be66-9cf8e1d6d0e5.png)
 
++ The marital status churn rate ranges from 15.18%-17.22%,with the unknown having the highest rate followed by the single customers.
++ The churn rate between the groups is relatively small,therefore marital status does not significantly impact the churn rate.
+
 **Income Category**
 ```sql
 SELECT 
@@ -240,6 +246,9 @@ ORDER BY Income_Category ASC;
 + The difference between existing and attrited customers is low for that income bracket, but then again.
 + Other factors such as customer satisfaction, pricing, customer service, product, service quality, and competition should also be considered to understand better why customers are leaving and how to improve retention.
 
+
+## Product Variables
+
 **Card category**
 
 ```sql
@@ -254,11 +263,8 @@ GROUP BY Card_Category
 ORDER BY Card_Category ASC;
 ```
 
-
 + The Platinum card has the highest churn rate of 25.00%, followed by the Gold card at 18.10%, the Blue card at 16.10%, and the Silver card at 14.77%.
 + A difference between existing and churned customers can lead to a higher churn rate. For instance, the Gold card has a relatively small difference of 74, but it has a high churn rate of 18.10%, maybe due to various factors, such as dissatisfaction with the service or better offers from competitors.
-
-## Product Variables
 
 **Months_on_book** 
 
@@ -382,6 +388,5 @@ FROM churncostomerseda.bankchurners;
 
 + The lesser the utilization of the card the higher the chances of attrition
 
-## Recommmedations
 
 
