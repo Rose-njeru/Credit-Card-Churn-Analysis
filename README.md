@@ -100,7 +100,7 @@ FROM churncostomerseda.bankchurners
 GROUP BY Attrition_Flag;
 ```
 
-```
+```sql
 UPDATE churncostomerseda.bankchurners
 SET Attrition_Flag=CASE 
 WHEN Attrition_FLag ='Attrited Customer' THEN 1 
